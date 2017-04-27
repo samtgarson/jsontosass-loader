@@ -4,7 +4,9 @@ var loaderUtils = require("loader-utils");
 var fs = require('fs');
 var path = require("path");
 module.exports = function(content) {
-  var query = loaderUtils.parseQuery(this.query).path;
+  var opts = loaderUtils.parseQuery(this.query);
+  var indented = opts.indentedSyntax
+  var query = opts.path;
   var queryString = JSON.stringify(query);
   var varPath = queryString.replace(/["']/g, '');
   this.cacheable();
@@ -16,8 +18,9 @@ module.exports = function(content) {
   function jsonToSassVars (obj, indent) {
     // Make object root properties into sass variables
     var sass = "";
+    var stopper = indented ? '\n' : ';\n';
     for (var key in obj) {
-      sass += "$" + key + ":" + JSON.stringify(obj[key], null, indent) + ";\n";
+      sass += "$" + key + ":" + JSON.stringify(obj[key], null, indent) + stopper;
     }
 
     if (!sass) {
